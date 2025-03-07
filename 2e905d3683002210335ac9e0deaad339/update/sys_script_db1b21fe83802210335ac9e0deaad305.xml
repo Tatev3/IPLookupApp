@@ -30,18 +30,36 @@
         <script><![CDATA[(function executeRule(current, previous /*null when async*/) {
 
 	// Add your code here
-r.setStringParameterNoEscape('ipaddress', 'current.ip_address');
-r.setStringParameterNoEscape('specific_field', 'geo');
+ try { 
+ var r = new sn_ws.RESTMessageV2('x_1597714_iplookup.IPInfo', 'GetIPInfo');
+ r.setStringParameterNoEscape('ipaddress', 'current.ip_address');
+ r.setStringParameterNoEscape('specific_field', 'geo');
 
-try {
-    var responseObj = JSON.parse(responseBody);
+//override authentication profile 
+//authentication type ='basic'/ 'oauth2'
+//r.setAuthenticationProfile(authentication type, profile name);
+
+//set a MID server name if one wants to run the message on MID
+//r.setMIDServer('MY_MID_SERVER');
+
+//if the message is configured to communicate through ECC queue, either
+//by setting a MID server or calling executeAsync, one needs to set skip_sensor
+//to true. Otherwise, one may get an intermittent error that the response body is null
+//r.setEccParameter('skip_sensor', true);
+
+ var response = r.execute();
+ var responseBody = response.getBody();
+ var httpStatus = response.getStatusCode();
+ var responseObj = JSON.parse(responseBody);
     current.city = responseObj.city;
     gs.info("City = " + current.city);
     current.update();
-} catch (err) {
+}
+catch (err) {
     gs.info("Uncaught error: " + err);
     var message = ex.message;
-}
+}	
+
 
 })(current, previous);]]></script>
         <sys_class_name>sys_script</sys_class_name>
@@ -50,7 +68,7 @@ try {
         <sys_domain>global</sys_domain>
         <sys_domain_path>/</sys_domain_path>
         <sys_id>db1b21fe83802210335ac9e0deaad305</sys_id>
-        <sys_mod_count>2</sys_mod_count>
+        <sys_mod_count>3</sys_mod_count>
         <sys_name>Populate IP Address City</sys_name>
         <sys_overrides/>
         <sys_package display_value="IPLookup" source="x_1597714_iplookup">2e905d3683002210335ac9e0deaad339</sys_package>
@@ -58,7 +76,7 @@ try {
         <sys_scope display_value="IPLookup">2e905d3683002210335ac9e0deaad339</sys_scope>
         <sys_update_name>sys_script_db1b21fe83802210335ac9e0deaad305</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2025-03-06 19:15:15</sys_updated_on>
+        <sys_updated_on>2025-03-07 18:01:10</sys_updated_on>
         <template/>
         <when>async_always</when>
     </sys_script>
